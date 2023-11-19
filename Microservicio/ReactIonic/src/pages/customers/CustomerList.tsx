@@ -1,41 +1,52 @@
 import { IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonMenuButton, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import ExploreContainer from '../../components/ExploreContainer';
 import { add, close, create, pencil } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
+import { removeCustomer, saveCustomer, searchCustomers } from './CustomerApi';
 
 
 const CustomerList: React.FC = () => {
 
-  const { name } = useParams<{ name: string; }>();
+    const { name } = useParams<{ name: string; }>();
+    const [clientes,setClientes] = useState<any>([]);
+    const history = useHistory();
 
-  const [clientes,setClientes] = useState<any>([]);
+    useEffect(() =>{
+      search();
+    }, [history.location.pathname]);
 
-  useEffect(() =>{
-    search();
-  }, [,]);
+    const search = () => {
+      let result = searchCustomers();
+      setClientes(result);
+    }
 
-  const search = () => {
-    const datosDeEjemplo = [
-        {
-            id: '1',
-            Firstname:'Steven',
-            Email:'steven.montoya19@unach.mx',
-            Phone:'9612034781',
-            Adress:'Boulevard',
-        },
-        {
-            Id: '2',
-            Firstname:'Luis',
-            Email:'Alfaro.Gutierrez29@unach.mx',
-            Phone:'45345345345',
-            Adress:'San Roque',
-        }
-    ];
-    setClientes(datosDeEjemplo);
-  }
+    const pruebaLocalStorage = () => {
+      const ejemplo = {
+        id: '1',
+        Firstname: 'Steven de Dios',
+        Lastname: 'Montoya',
+        Email: 'StevenMontoya19@unach.mx',
+        Phone: '9612034781',
+        Address: 'Playas de Catazaja',
+      }
+      saveCustomer(ejemplo);
+    }
 
-  return (
+    const remove = (id:string) => {
+      removeCustomer(id);
+      search();
+    }
+
+    const addCustomer = () => {
+      history.push('/page/customers/new')
+    }
+
+    const editCustomer = (id:string) => {
+      history.push('/page/customers/' + id)
+    }
+
+    return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
@@ -57,7 +68,7 @@ const CustomerList: React.FC = () => {
         <IonCard>
             <IonTitle>Gestion de Clientes</IonTitle>
             <IonItem>
-                <IonButton color={'primary'} fill='solid' slot='end' size='default'>
+                <IonButton onClick={addCustomer}  color={'primary'} fill='solid' slot='end' size='default'>
                     <IonIcon icon={add}/>
                     Agregar Cliente
                 </IonButton>
@@ -73,16 +84,16 @@ const CustomerList: React.FC = () => {
                 
                     {clientes.map((cliente:any) => 
                         <IonRow>
-                            <IonCol>{cliente.Firstname}</IonCol>
+                            <IonCol>{cliente.Firstname + ' ' + cliente.Lastname}</IonCol>
                             <IonCol>{cliente.Email}</IonCol>
                             <IonCol>{cliente.Phone}</IonCol>
-                            <IonCol>{cliente.Adress}</IonCol>
+                            <IonCol>{cliente.Address}</IonCol>
                             <IonCol>
-                                <IonButton fill='clear' color={'primary'}>
+                            <IonButton onClick={() => editCustomer(cliente.id)} fill='clear' color={'primary'}>
                                     <IonIcon slot='icon-only' icon={create}/>
                                     
                                 </IonButton>
-                                <IonButton fill='clear' color={'danger'}>
+                                <IonButton onClick={() => remove(cliente.id)} fill='clear' color={'danger'}>
                                     <IonIcon slot='icon-only' icon={close}/>
                                     
                                 </IonButton>
@@ -96,7 +107,10 @@ const CustomerList: React.FC = () => {
             </IonGrid>
         </IonCard>
 
-
+        <IonButton onClick={pruebaLocalStorage} fill='clear' color={'primary'}>
+          <IonIcon slot='icon-only' icon={create}/>
+                 Prueba Local Storage                   
+        </IonButton>
 
 
         
