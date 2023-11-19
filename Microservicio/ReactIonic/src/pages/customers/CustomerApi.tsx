@@ -1,4 +1,5 @@
 import { save } from "ionicons/icons";
+import Customer from "./Customer";
 
 export function searchCustomers(){
     if (!localStorage['customers']){
@@ -14,7 +15,7 @@ export function searchCustomers(){
 export function removeCustomer(id: string) {
     let customers = searchCustomers();
 
-    let indice = customers.findIndex((customer:any)=> customer.id ==id);
+    let indice = customers.findIndex((customer:Customer)=> customer.id ==id);
     customers.splice(indice,1);
     localStorage['customers'] = JSON.stringify(customers);
 }
@@ -23,15 +24,15 @@ export function removeCustomer(id: string) {
 
 
 
-export function saveCustomer(customer:any) {
+export function saveCustomer(customer:Customer) {
     let customers = searchCustomers();
     if (customer.id){
     //Editar
-    let indice = customers.findIndex((c:any)=> c.id ==customer.id);
+    let indice = customers.findIndex((c:Customer)=> c.id ==customer.id);
     customers[indice] = customer;
     }else {
     //Nuevo
-    customer.id = Math.round(Math.random()*1000000);
+    customer.id = String(Math.round(Math.random()*1000000));
     customers.push(customer)
     }
     localStorage['customers'] = JSON.stringify(customers);
